@@ -26,14 +26,6 @@ namespace NzbDrone.Core.Test.MediaFiles.MediaInfo
         }
 
         [Test]
-        public void get_runtime()
-        {
-            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "Files", "Media", "H264_sample.mp4");
-
-            Subject.GetRunTime(path).Value.Seconds.Should().Be(10);
-        }
-
-        [Test]
         public void get_info()
         {
             var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "Files", "Media", "H264_sample.mp4");
@@ -62,7 +54,7 @@ namespace NzbDrone.Core.Test.MediaFiles.MediaInfo
             info.VideoColourPrimaries.Should().Be("BT.601 NTSC");
             info.VideoTransferCharacteristics.Should().Be("BT.709");
             info.AudioAdditionalFeatures.Should().BeOneOf("", "LC");
-
+            info.Format.Should().Be("MPEG-4");
         }
 
         [Test]

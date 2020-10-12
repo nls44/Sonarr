@@ -10,6 +10,7 @@ using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.MediaFiles.EpisodeImport.Aggregation;
+using NzbDrone.Core.MediaFiles.MediaInfo;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Parser;
@@ -34,6 +35,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
         private readonly IEpisodeService _episodeService;
         private readonly IImportApprovedEpisodes _importApprovedEpisodes;
         private readonly IAggregationService _aggregationService;
+        private readonly IAugmentMediaInfo _augmentMediaInfo;
         private readonly ITrackedDownloadService _trackedDownloadService;
         private readonly IDownloadedEpisodesImportService _downloadedEpisodesImportService;
         private readonly IEventAggregator _eventAggregator;
@@ -46,6 +48,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
                                    ISeriesService seriesService,
                                    IEpisodeService episodeService,
                                    IAggregationService aggregationService,
+                                   IAugmentMediaInfo augmentMediaInfo,
                                    IImportApprovedEpisodes importApprovedEpisodes,
                                    ITrackedDownloadService trackedDownloadService,
                                    IDownloadedEpisodesImportService downloadedEpisodesImportService,
@@ -59,6 +62,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
             _seriesService = seriesService;
             _episodeService = episodeService;
             _aggregationService = aggregationService;
+            _augmentMediaInfo = augmentMediaInfo;
             _importApprovedEpisodes = importApprovedEpisodes;
             _trackedDownloadService = trackedDownloadService;
             _downloadedEpisodesImportService = downloadedEpisodesImportService;
@@ -319,6 +323,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
                     localEpisode.FolderEpisodeInfo = Parser.Parser.ParseTitle(file.FolderName);
                 }
 
+                localEpisode = _augmentMediaInfo.Augment(localEpisode);
                 localEpisode = _aggregationService.Augment(localEpisode, trackedDownload?.DownloadItem, false);
 
                 // Apply the user-chosen values.
