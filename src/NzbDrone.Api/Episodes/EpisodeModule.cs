@@ -4,6 +4,8 @@ using NzbDrone.Core.Tv;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.SignalR;
+using NzbDrone.Core.Configuration;
+using NzbDrone.Common.Disk;
 
 namespace NzbDrone.Api.Episodes
 {
@@ -12,8 +14,10 @@ namespace NzbDrone.Api.Episodes
         public EpisodeModule(ISeriesService seriesService,
                              IEpisodeService episodeService,
                              IUpgradableSpecification upgradableSpecification,
+                             IConfigService configService,
+                             IDiskProvider diskProvider,
                              IBroadcastSignalRMessage signalRBroadcaster)
-            : base(episodeService, seriesService, upgradableSpecification, signalRBroadcaster)
+            : base(episodeService, seriesService, upgradableSpecification, configService, diskProvider, signalRBroadcaster)
         {
             GetResourceAll = GetEpisodes;
             UpdateResource = SetMonitored;

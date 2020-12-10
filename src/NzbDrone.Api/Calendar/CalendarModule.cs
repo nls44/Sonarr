@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NzbDrone.Api.Episodes;
-using NzbDrone.Core.DecisionEngine;
+﻿using NzbDrone.Api.Episodes;
+using NzbDrone.Common.Disk;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.Tv;
 using NzbDrone.SignalR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NzbDrone.Api.Calendar
 {
@@ -14,8 +15,10 @@ namespace NzbDrone.Api.Calendar
         public CalendarModule(IEpisodeService episodeService,
                               ISeriesService seriesService,
                               IUpgradableSpecification upgradableSpecification,
+                              IConfigService configService,
+                              IDiskProvider diskProvider,
                               IBroadcastSignalRMessage signalRBroadcaster)
-            : base(episodeService, seriesService, upgradableSpecification, signalRBroadcaster, "calendar")
+            : base(episodeService, seriesService, upgradableSpecification, configService, diskProvider, signalRBroadcaster, "calendar")
         {
             GetResourceAll = GetCalendar;
         }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using NzbDrone.Api.EpisodeFiles;
 using NzbDrone.Api.Series;
+using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.DecisionEngine.Specifications;
@@ -21,16 +23,22 @@ namespace NzbDrone.Api.Episodes
         protected readonly IEpisodeService _episodeService;
         protected readonly ISeriesService _seriesService;
         protected readonly IUpgradableSpecification _upgradableSpecification;
+        protected readonly IConfigService _configService;
+        protected readonly IDiskProvider _diskProvider;
 
         protected EpisodeModuleWithSignalR(IEpisodeService episodeService,
                                            ISeriesService seriesService,
                                            IUpgradableSpecification upgradableSpecification,
+                                           IConfigService configService,
+                                           IDiskProvider diskProvider,
                                            IBroadcastSignalRMessage signalRBroadcaster)
             : base(signalRBroadcaster)
         {
             _episodeService = episodeService;
             _seriesService = seriesService;
             _upgradableSpecification = upgradableSpecification;
+            _configService = configService;
+            _diskProvider = diskProvider;
 
             GetResourceById = GetEpisode;
         }
@@ -38,6 +46,8 @@ namespace NzbDrone.Api.Episodes
         protected EpisodeModuleWithSignalR(IEpisodeService episodeService,
                                            ISeriesService seriesService,
                                            IUpgradableSpecification upgradableSpecification,
+                                           IConfigService configService,
+                                           IDiskProvider diskProvider,
                                            IBroadcastSignalRMessage signalRBroadcaster,
                                            string resource)
             : base(signalRBroadcaster, resource)
@@ -45,6 +55,8 @@ namespace NzbDrone.Api.Episodes
             _episodeService = episodeService;
             _seriesService = seriesService;
             _upgradableSpecification = upgradableSpecification;
+            _configService = configService;
+            _diskProvider = diskProvider;
 
             GetResourceById = GetEpisode;
         }
@@ -71,6 +83,11 @@ namespace NzbDrone.Api.Episodes
                 if (includeEpisodeFile && episode.EpisodeFileId != 0)
                 {
                     resource.EpisodeFile = episode.EpisodeFile.Value.ToResource(series, _upgradableSpecification);
+
+                    if (_configService.CopyUsingSymlinks)
+                    {
+                        resource.EpisodeFile.Path = _diskProvider.GetRealPath(resource.EpisodeFile.Path);
+                    }
                 }
             }
 
@@ -99,6 +116,11 @@ namespace NzbDrone.Api.Episodes
                     if (includeEpisodeFile && episodes[i].EpisodeFileId != 0)
                     {
                         resource.EpisodeFile = episodes[i].EpisodeFile.Value.ToResource(series, _upgradableSpecification);
+
+                        if (_configService.CopyUsingSymlinks)
+                        {
+                            resource.EpisodeFile.Path = _diskProvider.GetRealPath(resource.EpisodeFile.Path);
+                        }
                     }
                 }
             }

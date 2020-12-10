@@ -1,11 +1,12 @@
-using System.Linq;
 using NzbDrone.Api.Episodes;
+using NzbDrone.Common.Disk;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore;
-using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.Tv;
 using NzbDrone.SignalR;
 using Sonarr.Http;
+using System.Linq;
 
 namespace NzbDrone.Api.Wanted
 {
@@ -14,8 +15,10 @@ namespace NzbDrone.Api.Wanted
         public MissingModule(IEpisodeService episodeService,
                              ISeriesService seriesService,
                              IUpgradableSpecification upgradableSpecification,
+                             IConfigService configService,
+                             IDiskProvider diskProvider,
                              IBroadcastSignalRMessage signalRBroadcaster)
-            : base(episodeService, seriesService, upgradableSpecification, signalRBroadcaster, "wanted/missing")
+            : base(episodeService, seriesService, upgradableSpecification, configService, diskProvider, signalRBroadcaster, "wanted/missing")
         {
             GetResourcePaged = GetMissingEpisodes;
         }
